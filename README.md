@@ -53,3 +53,8 @@ YOUR_URL/api/doc
 
 # Informations
 I spent more than 3 hours. Maybe 3 or 4 hours of api development and 3 or 4 hours for swagger documentation, readme, datafixtures and installation tests.
+
+## Experience
+ - Symfony 5 : First use, on a daily basis I use symfony 3.4 or 4 since 3 years
+ - Swagger: First implementation, on a daily basis, I use apis developed by another team, but i use swagger UI
+ - Docker: Daily use for dev environnement since 5 years
