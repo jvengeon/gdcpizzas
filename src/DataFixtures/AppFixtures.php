@@ -18,7 +18,6 @@ class AppFixtures extends Fixture
 
     private function loadIngredients(ObjectManager $manager)
     {
-
         $ingredients = [
             [
                 'name' => 'Sliced mushrooms',
@@ -58,7 +57,7 @@ class AppFixtures extends Fixture
         ];
 
 
-        foreach($ingredients as $ingredient) {
+        foreach ($ingredients as $ingredient) {
             $ingredientEntity = new Ingredient();
             $ingredientEntity->setName($ingredient['name']);
             $ingredientEntity->setCost($ingredient['cost']);
@@ -67,12 +66,10 @@ class AppFixtures extends Fixture
         }
 
         $manager->flush();
-
     }
 
     private function loadPizzas(ObjectManager $manager)
     {
-
         $funPizza = new Pizza();
         $funPizza->setName('Fun Pizza');
         $funPizza->setPrice(7.5);
@@ -86,8 +83,8 @@ class AppFixtures extends Fixture
             'oregano',
         ];
 
-        foreach($funPizzaIngredientReferences as $index => $reference) {
-            $funPizzaIngredient= new PizzaIngredient();
+        foreach ($funPizzaIngredientReferences as $index => $reference) {
+            $funPizzaIngredient = new PizzaIngredient();
             $funPizzaIngredient->setPizza($funPizza);
             $funPizzaIngredient->setIngredient($this->getReference($reference));
             $funPizzaIngredient->setPriority($index + 1);
@@ -99,6 +96,5 @@ class AppFixtures extends Fixture
 
         $manager->persist($funPizza);
         $manager->flush();
-
     }
 }

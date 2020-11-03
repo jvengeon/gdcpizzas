@@ -10,7 +10,9 @@ use App\Formatter\ConstraintViolationListErrorMessageInterface;
 use App\Model\Error;
 use App\Repository\IngredientRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Nelmio\ApiDocBundle\Annotation\Model;
+use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,7 +22,6 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use OpenApi\Annotations as OA;
 
 /**
  * @Route("/api/v1", name="api_ingredient_")
@@ -105,7 +106,7 @@ class IngredientController extends AbstractController
             );
 
             return new JsonResponse($ingredientsJson, JsonResponse::HTTP_OK, [], true);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $error = $this->errorFactory->createError(ErrorMessage::DEFAULT_MESSAGE);
             return new JsonResponse($error, JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -123,7 +124,7 @@ class IngredientController extends AbstractController
      *     description="Return ingredient",
      *     @Model(type=Ingredient::class)
      * )
-     *  @OA\Response(
+     * @OA\Response(
      *     response=404,
      *     description="Returned when ingredient not found"
      * )
@@ -143,7 +144,7 @@ class IngredientController extends AbstractController
             );
 
             return new JsonResponse($ingredientJson, JsonResponse::HTTP_OK, [], true);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $error = $this->errorFactory->createError(ErrorMessage::DEFAULT_MESSAGE);
             return new JsonResponse($error, JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -178,7 +179,11 @@ class IngredientController extends AbstractController
     public function create(Request $request): Response
     {
         try {
-            $ingredient = $this->serializer->deserialize($request->getContent(), Ingredient::class, SerializeFormat::JSON_FORMAT);
+            $ingredient = $this->serializer->deserialize(
+                $request->getContent(),
+                Ingredient::class,
+                SerializeFormat::JSON_FORMAT
+            );
 
             //validate datas
             $errors = $this->validator->validate($ingredient);
@@ -197,7 +202,7 @@ class IngredientController extends AbstractController
                 'An error occured with your datas. Please check datas and json format.'
             );
             return new JsonResponse($error, JsonResponse::HTTP_BAD_REQUEST);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $error = $this->errorFactory->createError(ErrorMessage::DEFAULT_MESSAGE);
             return new JsonResponse($error, JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -232,7 +237,12 @@ class IngredientController extends AbstractController
     public function update(Request $request, Ingredient $ingredient): Response
     {
         try {
-            $this->serializer->deserialize($request->getContent(), Ingredient::class, SerializeFormat::JSON_FORMAT, ['object_to_populate' => $ingredient]);
+            $this->serializer->deserialize(
+                $request->getContent(),
+                Ingredient::class,
+                SerializeFormat::JSON_FORMAT,
+                ['object_to_populate' => $ingredient]
+            );
 
             //validate datas
             $errors = $this->validator->validate($ingredient);
@@ -246,17 +256,15 @@ class IngredientController extends AbstractController
             $this->entityManager->flush($ingredient);
 
             return new JsonResponse([], JsonResponse::HTTP_NO_CONTENT);
-
         } catch (NotEncodableValueException $e) {
             $error = $this->errorFactory->createError(
                 'An error occured with your datas. Please check datas and json format.'
             );
             return new JsonResponse($error, JsonResponse::HTTP_BAD_REQUEST);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $error = $this->errorFactory->createError(ErrorMessage::DEFAULT_MESSAGE);
             return new JsonResponse($error, JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
-
     }
 
     /**
@@ -286,10 +294,9 @@ class IngredientController extends AbstractController
             $this->entityManager->flush();
 
             return new JsonResponse([], JsonResponse::HTTP_NO_CONTENT);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $error = $this->errorFactory->createError(ErrorMessage::DEFAULT_MESSAGE);
             return new JsonResponse($error, JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
-
     }
 }

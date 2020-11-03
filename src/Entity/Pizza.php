@@ -109,7 +109,7 @@ class Pizza
     public function calculatePrice(): float
     {
         $price = 0;
-        foreach($this->getIngredients() as $ingredient) {
+        foreach ($this->getIngredients() as $ingredient) {
             $price += $ingredient->getIngredient()->getCost();
         }
 

@@ -4,10 +4,12 @@
 namespace App\Factory;
 
 
+use App\Model\Error;
+
 class ErrorModel
 {
-    public function createError(string $message): \App\Model\Error
+    public function createError(string $message): Error
     {
-        return new \App\Model\Error($message);
+        return new Error($message);
     }
 }

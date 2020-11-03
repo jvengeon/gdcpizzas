@@ -15,6 +15,7 @@ use App\Repository\IngredientRepository;
 use App\Repository\PizzaIngredientRepository;
 use App\Repository\PizzaRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Annotations as OA;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
@@ -126,7 +127,7 @@ class PizzaController extends AbstractController
             );
 
             return new JsonResponse($pizzasJson, JsonResponse::HTTP_OK, [], true);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $error = $this->errorFactory->createError(ErrorMessage::DEFAULT_MESSAGE);
             return new JsonResponse($error, JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -144,7 +145,7 @@ class PizzaController extends AbstractController
      *     description="Return pizza",
      *     @Model(type=Pizza::class, groups={"show_pizza"})
      * )
-     *  @OA\Response(
+     * @OA\Response(
      *     response=404,
      *     description="Returned when ingredient not found"
      * )
@@ -164,7 +165,7 @@ class PizzaController extends AbstractController
             );
 
             return new JsonResponse($pizzaJson, JsonResponse::HTTP_OK, [], true);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $error = $this->errorFactory->createError(ErrorMessage::DEFAULT_MESSAGE);
             return new JsonResponse($error, JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -220,7 +221,7 @@ class PizzaController extends AbstractController
                 'An error occured with your datas. Please check datas and json format.'
             );
             return new JsonResponse($error, JsonResponse::HTTP_BAD_REQUEST);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $error = $this->errorFactory->createError(ErrorMessage::DEFAULT_MESSAGE);
             return new JsonResponse($error, JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -255,7 +256,12 @@ class PizzaController extends AbstractController
     public function update(Request $request, Pizza $pizza): Response
     {
         try {
-            $this->serializer->deserialize($request->getContent(), Pizza::class, SerializeFormat::JSON_FORMAT, ['object_to_populate' => $pizza]);
+            $this->serializer->deserialize(
+                $request->getContent(),
+                Pizza::class,
+                SerializeFormat::JSON_FORMAT,
+                ['object_to_populate' => $pizza]
+            );
 
             //validate datas
             $errors = $this->validator->validate($pizza);
@@ -269,17 +275,15 @@ class PizzaController extends AbstractController
             $this->entityManager->flush($pizza);
 
             return new JsonResponse([], JsonResponse::HTTP_NO_CONTENT);
-
         } catch (NotEncodableValueException $e) {
             $error = $this->errorFactory->createError(
                 'An error occured with your datas. Please check datas and json format.'
             );
             return new JsonResponse($error, JsonResponse::HTTP_BAD_REQUEST);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $error = $this->errorFactory->createError(ErrorMessage::DEFAULT_MESSAGE);
             return new JsonResponse($error, JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
-
     }
 
     /**
@@ -309,11 +313,10 @@ class PizzaController extends AbstractController
             $this->entityManager->flush();
 
             return new JsonResponse([], JsonResponse::HTTP_NO_CONTENT);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $error = $this->errorFactory->createError(ErrorMessage::DEFAULT_MESSAGE);
             return new JsonResponse($error, JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
-
     }
 
     /**
@@ -389,7 +392,7 @@ class PizzaController extends AbstractController
                 'An error occured with your datas. Please check datas and json format.'
             );
             return new JsonResponse($error, JsonResponse::HTTP_BAD_REQUEST);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $error = $this->errorFactory->createError(ErrorMessage::DEFAULT_MESSAGE);
             return new JsonResponse($error, JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -429,7 +432,7 @@ class PizzaController extends AbstractController
             $this->entityManager->flush($pizza);
 
             return new JsonResponse([], JsonResponse::HTTP_NO_CONTENT);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $error = $this->errorFactory->createError(ErrorMessage::DEFAULT_MESSAGE);
             return new JsonResponse($error, JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -497,7 +500,7 @@ class PizzaController extends AbstractController
             $this->entityManager->flush($pizzaIngredientEntity);
 
             return new JsonResponse([], JsonResponse::HTTP_NO_CONTENT);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $error = $this->errorFactory->createError(ErrorMessage::DEFAULT_MESSAGE);
             return new JsonResponse($error, JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }

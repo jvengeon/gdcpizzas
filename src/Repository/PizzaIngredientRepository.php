@@ -45,8 +45,7 @@ class PizzaIngredientRepository extends ServiceEntityRepository
             ->setParameter('pizzaId', $pizzaId)
             ->setParameter('ingredientId', $ingredientId)
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getOneOrNullResult();
     }
 
 }
