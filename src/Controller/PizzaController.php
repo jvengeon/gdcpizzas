@@ -8,7 +8,8 @@ use App\Entity\Ingredient;
 use App\Entity\Pizza;
 use App\Entity\PizzaIngredient;
 use App\Exception\PizzaException;
-use App\Factory\Error as ErrorFactory;
+use App\Factory\ErrorModel as ErrorFactory;
+use App\Formatter\ConstraintViolationListErrorMessageInterface;
 use App\Model\Error;
 use App\Repository\IngredientRepository;
 use App\Repository\PizzaIngredientRepository;
@@ -16,6 +17,7 @@ use App\Repository\PizzaRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Annotations as OA;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Cache;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -24,7 +26,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Exception\NotEncodableValueException;
 use Symfony\Component\Serializer\SerializerInterface;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
@@ -67,6 +68,11 @@ class PizzaController extends AbstractController
      */
     private $errorFactory;
 
+    /**
+     * @var ConstraintViolationListErrorMessageInterface
+     */
+    private $constraintViolationListErrorMessageFormatter;
+
 
     public function __construct(
         SerializerInterface $serializer,
@@ -75,7 +81,8 @@ class PizzaController extends AbstractController
         PizzaIngredientRepository $pizzaIngredientRepository,
         ValidatorInterface $validator,
         EntityManagerInterface $entityManager,
-        ErrorFactory $errorFactory
+        ErrorFactory $errorFactory,
+        ConstraintViolationListErrorMessageInterface $constraintViolationListErrorMessageFormatter
     ) {
         $this->serializer = $serializer;
         $this->pizzaRepository = $pizzaRepository;
@@ -84,9 +91,11 @@ class PizzaController extends AbstractController
         $this->validator = $validator;
         $this->entityManager = $entityManager;
         $this->errorFactory = $errorFactory;
+        $this->constraintViolationListErrorMessageFormatter = $constraintViolationListErrorMessageFormatter;
     }
 
     /**
+     * @Cache(smaxage="3600")
      * @Route("/pizza", name="list", methods="GET")
      * @OA\Get(
      *     summary="Retrieve the collection of pizzas",
@@ -94,7 +103,7 @@ class PizzaController extends AbstractController
      * )
      * @OA\Response(
      *     response=200,
-     *     description="Return list of pizzas",
+     *     description="Return collection of pizzas",
      *     @OA\JsonContent(
      *        type="array",
      *        @OA\Items(ref=@Model(type=Pizza::class, groups={"show_pizza"}))
@@ -124,6 +133,7 @@ class PizzaController extends AbstractController
     }
 
     /**
+     * @Cache(smaxage="3600")
      * @Route("/pizza/{id}", name="show", methods="GET")
      * @OA\Get(
      *     summary="Retrieve a pizza",
@@ -133,6 +143,10 @@ class PizzaController extends AbstractController
      *     response=200,
      *     description="Return pizza",
      *     @Model(type=Pizza::class, groups={"show_pizza"})
+     * )
+     *  @OA\Response(
+     *     response=404,
+     *     description="Returned when ingredient not found"
      * )
      * @OA\Response (
      *     response=500,
@@ -186,15 +200,16 @@ class PizzaController extends AbstractController
     {
         try {
             $pizza = $this->serializer->deserialize($request->getContent(), Pizza::class, SerializeFormat::JSON_FORMAT);
-            $pizza->setPrice($pizza->calculatePrice());
 
             //validate datas
             $errors = $this->validator->validate($pizza);
             if (count($errors) > 0) {
-                $errorList = $this->buildErrorList($errors);
+                $errorList = $this->constraintViolationListErrorMessageFormatter->format($errors);
                 $error = $this->errorFactory->createError($errorList);
                 return new JsonResponse($error, JsonResponse::HTTP_BAD_REQUEST);
             }
+
+            $pizza->setPrice($pizza->calculatePrice());
 
             $this->entityManager->persist($pizza);
             $this->entityManager->flush($pizza);
@@ -245,7 +260,7 @@ class PizzaController extends AbstractController
             //validate datas
             $errors = $this->validator->validate($pizza);
             if (count($errors) > 0) {
-                $errorList = $this->buildErrorList($errors);
+                $errorList = $this->constraintViolationListErrorMessageFormatter->format($errors);
                 $error = $this->errorFactory->createError($errorList);
                 return new JsonResponse($error, JsonResponse::HTTP_BAD_REQUEST);
             }
@@ -343,7 +358,7 @@ class PizzaController extends AbstractController
             //validate datas
             $errors = $this->validator->validate($pizzaIngredient);
             if (count($errors) > 0) {
-                $errorList = $this->buildErrorList($errors);
+                $errorList = $this->constraintViolationListErrorMessageFormatter->format($errors);
                 $error = $this->errorFactory->createError($errorList);
                 return new JsonResponse($error, JsonResponse::HTTP_BAD_REQUEST);
             }
@@ -486,23 +501,6 @@ class PizzaController extends AbstractController
             $error = $this->errorFactory->createError(ErrorMessage::DEFAULT_MESSAGE);
             return new JsonResponse($error, JsonResponse::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }
-
-    /**
-     * @param ConstraintViolationListInterface $errors
-     * @return string
-     */
-    private function buildErrorList(ConstraintViolationListInterface $errors): string
-    {
-        //json_encode directly from $errors return nothing. Generate list of error messages
-        $errorsList = array_map(
-            function ($error) {
-                return $error->getMessage();
-            },
-            iterator_to_array($errors)
-        );
-
-        return implode($errorsList, ', ');
     }
 
 }

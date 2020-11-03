@@ -4,7 +4,7 @@
 namespace App\Factory;
 
 
-class Error
+class ErrorModel
 {
     public function createError(string $message): \App\Model\Error
     {
