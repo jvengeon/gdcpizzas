@@ -19,24 +19,6 @@ class PizzaIngredientRepository extends ServiceEntityRepository
         parent::__construct($registry, PizzaIngredient::class);
     }
 
-    // /**
-    //  * @return PizzaIngredient[] Returns an array of PizzaIngredient objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
-    */
-
-
     public function findOneByPizzaIdAndIngredientId(int $pizzaId, int $ingredientId): ?PizzaIngredient
     {
         return $this->createQueryBuilder('p')
@@ -47,5 +29,4 @@ class PizzaIngredientRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
-
 }
