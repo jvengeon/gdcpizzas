@@ -37,6 +37,7 @@ class Pizza
 
     /**
      * @ORM\OneToMany(targetEntity=PizzaIngredient::class, mappedBy="pizza", orphanRemoval=true, cascade={"persist"})
+     * @ORM\OrderBy({"priority" = "ASC"})
      * @Groups({"show_pizza", "add_pizza"})
      * @Assert\Valid()
      */
