@@ -22,14 +22,14 @@ class Ingredient
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"show_pizza"})
+     * @Groups({"show_pizza", "add_ingredient"})
      * @Assert\NotBlank(message="Ingredient name cannot be empty")
      */
     private $name;
 
     /**
      * @ORM\Column(type="float")
-     * @Groups({"show_pizza"})
+     * @Groups({"show_pizza", "add_ingredient"})
      * @Assert\NotBlank(message="Pizza cost cannot be empty")
      */
     private $cost;
