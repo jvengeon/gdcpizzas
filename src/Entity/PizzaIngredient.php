@@ -30,7 +30,7 @@ class PizzaIngredient
 
     /**
      * @ORM\ManyToOne(targetEntity=Ingredient::class)
-     * @ORM\JoinColumn(nullable=false)
+     * @ORM\JoinColumn(nullable=false, onDelete="CASCADE")
      * @Groups({"show_pizza", "add_pizza"})
      * @Assert\NotBlank(message="Ingredient cannot be empty or must exist")
      */

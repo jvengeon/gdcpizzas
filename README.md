@@ -59,7 +59,7 @@ YOUR_URL/api/doc
  - Use translations for error messages
  - Better management of ingredient priority to reorder automatically others ingredients
  - Create custom ParamConverter to handle 404 in JsonResponse
- 
+ - Add PATCH route to allow only a few fields to be updated
 
 # Informations
 I spent more than 3 hours. Maybe 4 hours of api development and 3 or 4 hours for swagger documentation, readme, datafixtures and installation tests.
