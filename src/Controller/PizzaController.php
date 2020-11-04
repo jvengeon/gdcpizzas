@@ -424,6 +424,13 @@ class PizzaController extends AbstractController
                 $pizza->getId(),
                 $ingredient->getId()
             );
+
+            if (!$pizzaIngredient instanceof PizzaIngredient) {
+                $error = $this->errorFactory->createError(
+                    'This ingredient does not exist for this pizza'
+                );
+                return new JsonResponse($error, JsonResponse::HTTP_NOT_FOUND);
+            }
             $pizza->removeIngredient($pizzaIngredient);
 
             $this->entityManager->persist($pizza);
