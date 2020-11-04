@@ -30,6 +30,16 @@ symfony console doctrine:fixtures:load
 composer install --no-dev --optimize-autoloader
 ```
 
+If your database does not exists
+ ```bash
+php bin/console doctrine:database:create
+php bin/console doctrine:migrations:migrate
+```
+
+If your database already exists
+ ```bash
+php bin/console doctrine:migrations:migrate
+```
 
 # Documentation
 
@@ -52,7 +62,11 @@ YOUR_URL/api/doc
  
 
 # Informations
-I spent more than 3 hours. Maybe 3 or 4 hours of api development and 3 or 4 hours for swagger documentation, readme, datafixtures and installation tests.
+I spent more than 3 hours. Maybe 4 hours of api development and 3 or 4 hours for swagger documentation, readme, datafixtures and installation tests.
+
+My first idea was to use API Platform to respect the 3 hours, because it respects REST standards, automatically generates the doc and other advanced features.
+
+But I thought it wouldn't show enough of my way of coding, so I chose to code the API myself, even if it meant spending more time on it.
 
 ## Experience
  - Symfony 5 : First use, on a daily basis I use symfony 3.4 or 4 since 3 years
