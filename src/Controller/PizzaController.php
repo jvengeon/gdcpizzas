@@ -210,8 +210,6 @@ class PizzaController extends AbstractController
                 return new JsonResponse($error, JsonResponse::HTTP_BAD_REQUEST);
             }
 
-            $pizza->setPrice($pizza->calculatePrice());
-
             $this->entityManager->persist($pizza);
             $this->entityManager->flush($pizza);
 

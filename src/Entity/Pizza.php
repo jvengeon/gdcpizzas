@@ -30,7 +30,6 @@ class Pizza
     private $name;
 
     /**
-     * @ORM\Column(type="float")
      * @Groups({"show_pizza"})
      */
     private $price;
@@ -67,15 +66,14 @@ class Pizza
 
     public function getPrice(): ?float
     {
-        return $this->price;
+        $price = 0;
+        foreach ($this->getIngredients() as $ingredient) {
+            $price += $ingredient->getIngredient()->getCost();
+        }
+
+        return $price + ($price / 2);
     }
 
-    public function setPrice(float $price): self
-    {
-        $this->price = $price;
-
-        return $this;
-    }
 
     /**
      * @return Collection|PizzaIngredient[]
@@ -105,15 +103,5 @@ class Pizza
         }
 
         return $this;
-    }
-
-    public function calculatePrice(): float
-    {
-        $price = 0;
-        foreach ($this->getIngredients() as $ingredient) {
-            $price += $ingredient->getIngredient()->getCost();
-        }
-
-        return $price + ($price / 2);
     }
 }

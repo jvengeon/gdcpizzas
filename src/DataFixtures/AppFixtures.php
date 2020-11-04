@@ -72,7 +72,6 @@ class AppFixtures extends Fixture
     {
         $funPizza = new Pizza();
         $funPizza->setName('Fun Pizza');
-        $funPizza->setPrice(7.5);
 
         $funPizzaIngredientReferences = [
             'sliced_mushrooms',
